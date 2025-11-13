@@ -4,6 +4,7 @@ import { usePartAllowableStatuses } from '../hooks/usePartAllowableStatuses'
 import type { PartStatus } from '../types/api'
 import { useUpdatePart } from '../hooks/useUpdatePart'
 import { ErrorDisplay } from './ErrorDisplay'
+import styles from './PartViewer.module.css'
 
 interface PartViewerProps {
   partUuid: string
@@ -34,23 +35,15 @@ export function PartViewer({ partUuid }: PartViewerProps) {
 
   if (partIsLoading) {
     return (
-      <div
-        style={{
-          padding: '2rem',
-          minHeight: '160px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div style={{ color: '#555' }}>Loading part details...</div>
+      <div className={styles.loading}>
+        <div className={styles.loadingText}>Loading part details...</div>
       </div>
     )
   }
 
   if (partError || !part) {
     return (
-      <div style={{ padding: '1rem' }}>
+      <div className={styles.errorContainer}>
         <ErrorDisplay
           error={partError || new Error('Part not found')}
           onRetry={() => refetchPart()}
@@ -75,28 +68,28 @@ export function PartViewer({ partUuid }: PartViewerProps) {
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h3>{part.name}</h3>
-      <div style={{ marginBottom: '0.5rem' }}>
-        <strong>Part UUID:</strong> {part.uuid}
+    <div className={styles.container}>
+      <h3 className={styles.heading}>{part.name}</h3>
+      <div className={styles.field}>
+        <span className={styles.label}>Part UUID:</span> {part.uuid}
       </div>
-      <div style={{ marginBottom: '0.5rem' }}>
-        <strong>Unit:</strong> {part.unit}
+      <div className={styles.field}>
+        <span className={styles.label}>Unit:</span> {part.unit}
       </div>
       {part.version && (
-        <div style={{ marginBottom: '0.5rem' }}>
-          <strong>Version:</strong> {part.version}
+        <div className={styles.field}>
+          <span className={styles.label}>Version:</span> {part.version}
         </div>
       )}
 
-      <div style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>
-        <strong>Status:</strong>
+      <div className={styles.statusSection}>
+        <span className={styles.label}>Status:</span>
       </div>
 
       {isEditing ? (
-        <div>
+        <div className={styles.statusEditor}>
           {allowableStatusesLoading ? (
-            <div>Loading available statuses...</div>
+            <div className={styles.loadingText}>Loading available statuses...</div>
           ) : allowableStatusesError ? (
             <ErrorDisplay
               error={allowableStatusesError}
@@ -104,31 +97,30 @@ export function PartViewer({ partUuid }: PartViewerProps) {
               title="Failed to Load Status Options"
             />
           ) : (
-            <>
+            <div className={styles.statusControls}>
               <select
+                className={styles.select}
                 value={selectedStatus || ''}
                 onChange={(e) =>
                   setSelectedStatus(e.target.value as PartStatus)
                 }
-                style={{
-                  padding: '0.25rem',
-                  marginRight: '0.5rem',
-                  marginBottom: '0.5rem',
-                }}
               >
                 {allowableStatuses?.allowableStatuses.map((status) => (
                   <option
                     key={status}
                     value={status}
-                    style={{
-                      fontWeight: part.status === status ? 'bold' : 'normal',
-                    }}
+                    className={
+                      part.status === status
+                        ? styles.selectOptionCurrent
+                        : styles.selectOption
+                    }
                   >
                     {status}
                   </option>
                 ))}
               </select>
               <button
+                className={styles.buttonSuccess}
                 onClick={(e) => {
                   e.preventDefault()
                   handleSaveStatus()
@@ -136,49 +128,24 @@ export function PartViewer({ partUuid }: PartViewerProps) {
                 disabled={
                   selectedStatus === part.status || updatePartMutation.isPending
                 }
-                style={{
-                  padding: '0.25rem 0.75rem',
-                  marginRight: '0.5rem',
-                  backgroundColor: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor:
-                    selectedStatus === part.status ||
-                    updatePartMutation.isPending
-                      ? 'not-allowed'
-                      : 'pointer',
-                  opacity:
-                    selectedStatus === part.status ||
-                    updatePartMutation.isPending
-                      ? 0.6
-                      : 1,
-                }}
               >
                 {updatePartMutation.isPending ? 'Saving...' : 'Save'}
               </button>
               <button
+                className={styles.buttonSecondary}
                 onClick={(e) => {
                   e.preventDefault()
                   setIsEditing(false)
                   setSelectedStatus(null)
                   updatePartMutation.reset()
                 }}
-                style={{
-                  padding: '0.25rem 0.75rem',
-                  backgroundColor: '#6c757d',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
               >
                 Cancel
               </button>
-            </>
+            </div>
           )}
           {updatePartMutation.isError && (
-            <div style={{ marginTop: '0.5rem' }}>
+            <div className={styles.errorMessage}>
               <ErrorDisplay
                 error={updatePartMutation.error}
                 title="Failed to Update Status"
@@ -187,21 +154,14 @@ export function PartViewer({ partUuid }: PartViewerProps) {
           )}
         </div>
       ) : (
-        <div>
-          <span style={{ marginRight: '1rem' }}>{part.status}</span>
+        <div className={styles.statusDisplay}>
+          <span className={styles.statusValue}>{part.status}</span>
           <button
+            className={styles.buttonPrimary}
             onClick={(e) => {
               e.preventDefault()
               setSelectedStatus(part.status)
               setIsEditing(true)
-            }}
-            style={{
-              padding: '0.25rem 0.75rem',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer',
             }}
           >
             Edit

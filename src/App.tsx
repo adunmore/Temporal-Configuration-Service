@@ -37,12 +37,14 @@ function App() {
     }
   }, [timeMachines, selectedMachineId])
 
-  // Auto-select the root machine node when machine changes
+  // Auto-select the root machine node when machine changes and ensure it's expanded
   useEffect(() => {
     if (selectedMachineId) {
       const machine = configLookupRef.current.get(selectedMachineId)
       if (machine) {
         setSelectedConfig(machine)
+        // Always keep the TimeMachine node expanded
+        setExpandedNodes((prev) => new Set([...prev, selectedMachineId]))
       }
     }
   }, [selectedMachineId])
@@ -69,7 +71,12 @@ function App() {
 
   const handleExpandedChange = (keys: Set<React.Key>) => {
     // Convert React.Key to string for our state
-    setExpandedNodes(new Set(Array.from(keys).map(String)))
+    const newExpandedNodes = new Set(Array.from(keys).map(String))
+    // Always keep the TimeMachine node expanded
+    if (selectedMachineId) {
+      newExpandedNodes.add(selectedMachineId)
+    }
+    setExpandedNodes(newExpandedNodes)
   }
 
   if (isLoading) {
@@ -149,6 +156,7 @@ function App() {
                   config={selectedMachine}
                   registerConfig={registerConfig}
                   expandedKeys={expandedNodes}
+                  isTimeMachine={true}
                 />
               </Tree>
             )}

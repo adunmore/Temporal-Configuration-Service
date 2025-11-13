@@ -15,12 +15,14 @@ interface ConfigNodeProps {
   config: Configuration
   registerConfig?: (config: Configuration) => void
   expandedKeys?: Set<string>
+  isTimeMachine?: boolean
 }
 
 export function ConfigNode({
   config,
   registerConfig,
   expandedKeys,
+  isTimeMachine = false,
 }: ConfigNodeProps) {
   // Register this config for lookup when it mounts
   useEffect(() => {
@@ -43,8 +45,8 @@ export function ConfigNode({
         {({ hasChildItems }) => (
           <>
             <div className={styles.nodeContent}>
-              {/* Only render chevron if item has children */}
-              {hasChildItems ? (
+              {/* Only render chevron if item has children and is not a TimeMachine */}
+              {hasChildItems && !isTimeMachine ? (
                 <Button slot="chevron" className={styles.chevronButton}>
                   {childrenLoading ? (
                     <span className={styles.chevron}>⋯</span>
@@ -97,6 +99,7 @@ export function ConfigNode({
               config={item.config}
               registerConfig={registerConfig}
               expandedKeys={expandedKeys}
+              isTimeMachine={false}
             />
           )}
         </Collection>
