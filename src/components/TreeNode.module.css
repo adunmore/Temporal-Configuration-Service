@@ -1,0 +1,108 @@
+.nodeContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s ease;
+  user-select: none;
+}
+
+.chevronButton {
+  all: unset;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  color: var(--color-muted);
+  transition: transform 0.2s ease;
+}
+
+.chevronButton:hover {
+  color: var(--color-text);
+}
+
+.chevronSpacer {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.chevronIcon {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s ease;
+}
+
+/* Rotate chevron when expanded */
+:global([data-expanded]) .chevronIcon {
+  transform: rotate(90deg);
+}
+
+.chevron {
+  font-size: 12px;
+  user-select: none;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-sm);
+}
+
+.serial {
+  color: var(--color-muted);
+  margin-left: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+}
+
+.error {
+  color: var(--color-error);
+}
+
+.childError {
+  margin-left: var(--spacing-xl);
+  margin-top: var(--spacing-xs);
+}
+
+/* React Aria state styling */
+:global(.react-aria-TreeItem[data-focused]) .nodeContent {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+:global(.react-aria-TreeItem[data-selected]) .nodeContent {
+  background-color: var(--color-selected-bg);
+  font-weight: var(--font-weight-semibold);
+}
+
+:global(.react-aria-TreeItem[data-hovered]:not([data-selected]):not([data-focused])) .nodeContent {
+  background-color: var(--color-hover-bg);
+}
+
+:global(.react-aria-TreeItem[data-hovered][data-focused]:not([data-selected])) .nodeContent {
+  background-color: var(--color-hover-bg);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+:global(.react-aria-TreeItem[data-disabled]) .nodeContent {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+:global(.react-aria-TreeItem[data-selected][data-focused]) .nodeContent {
+  background-color: var(--color-selected-hover-bg);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}

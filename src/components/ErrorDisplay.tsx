@@ -1,4 +1,5 @@
 import { getErrorMessage } from '../utils/errors'
+import styles from './ErrorDisplay.module.css'
 
 interface ErrorDisplayProps {
   error: unknown
@@ -13,31 +14,17 @@ export function ErrorDisplay({ error, onRetry, title = 'Error' }: ErrorDisplayPr
   const message = getErrorMessage(error)
 
   return (
-    <div
-      style={{
-        padding: '1rem',
-        border: '1px solid #dc3545',
-        borderRadius: '4px',
-        backgroundColor: '#fff5f5',
-        color: '#721c24',
-      }}
-    >
-      <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+    <div className={styles.container}>
+      <div className={styles.title}>
         ⚠️ {title}
       </div>
-      <div style={{ marginBottom: onRetry ? '1rem' : 0 }}>{message}</div>
+      <div className={onRetry ? styles.messageWithButton : styles.message}>
+        {message}
+      </div>
       {onRetry && (
         <button
           onClick={onRetry}
-          style={{
-            padding: '0.25rem 0.75rem',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-          }}
+          className={styles.retryButton}
         >
           Retry
         </button>

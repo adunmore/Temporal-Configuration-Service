@@ -1,24 +1,33 @@
+import {
+  TreeItem,
+  TreeItemContent,
+  Collection,
+  Button,
+} from 'react-aria-components'
+import { useEffect } from 'react'
 import { useChildrenWithParts } from '../hooks/useChildrenWithParts'
 import { usePart } from '../hooks/usePart'
 import type { Configuration } from '../types/api'
 import { ErrorDisplay } from './ErrorDisplay'
+import styles from './TreeNode.module.css'
 
-interface TreeNodeProps {
+interface ConfigNodeProps {
   config: Configuration
-  expandedNodes: Set<string>
-  onToggleExpanded: (uuid: string) => void
-  onSelectConfig: (config: Configuration) => void
-  selectedConfigId: string | null
+  registerConfig?: (config: Configuration) => void
+  expandedKeys?: Set<string>
 }
 
-export function TreeNode({
+export function ConfigNode({
   config,
-  expandedNodes,
-  onToggleExpanded,
-  onSelectConfig,
-  selectedConfigId: selectedNodeId,
-}: TreeNodeProps) {
-  const isExpanded = expandedNodes.has(config.uuid)
+  registerConfig,
+  expandedKeys,
+}: ConfigNodeProps) {
+  // Register this config for lookup when it mounts
+  useEffect(() => {
+    registerConfig?.(config)
+  }, [config, registerConfig])
+
+  const { data: part, error: partError } = usePart(config.partUuid)
 
   // Fetch children to know if node is expandable
   const {
@@ -28,90 +37,70 @@ export function TreeNode({
     refetch: refetchChildren,
   } = useChildrenWithParts(config.uuid)
 
-  const { data: part, error: partError } = usePart(config.partUuid)
-
-  // Determine what icon to show
-  const hasChildren = childrenWithParts && childrenWithParts.length > 0
-  const expandIcon = childrenLoading
-    ? '⋯'
-    : childrenError
-    ? ''
-    : hasChildren
-    ? isExpanded
-      ? '▼'
-      : '▶'
-    : ''
-
-  const childErrorDisplay = childrenError ? (
-    <ErrorDisplay
-      error={childrenError}
-      onRetry={() => refetchChildren()}
-      title="Failed to Load Child Configurations"
-    />
-  ) : null
-
   return (
-    <div>
-      <div
-        onClick={(e) => {
-          e.stopPropagation()
-          onSelectConfig(config)
-        }}
-        style={{
-          cursor: 'pointer',
-          padding: '4px 8px',
-          fontWeight: selectedNodeId === config.uuid ? 'bold' : 'normal',
-        }}
-      >
-        <span
-          style={{ width: '16px', display: 'inline-block' }}
-          onClick={(e) => {
-            e.stopPropagation()
-            if (hasChildren) {
-              onToggleExpanded(config.uuid)
-            }
-          }}
+    <TreeItem id={config.uuid} textValue={part?.name || 'Loading...'}>
+      <TreeItemContent>
+        {({ hasChildItems }) => (
+          <>
+            <div className={styles.nodeContent}>
+              {/* Only render chevron if item has children */}
+              {hasChildItems ? (
+                <Button slot="chevron" className={styles.chevronButton}>
+                  {childrenLoading ? (
+                    <span className={styles.chevron}>⋯</span>
+                  ) : childrenError ? (
+                    <span className={styles.chevron}></span>
+                  ) : (
+                    <svg className={styles.chevronIcon} viewBox="0 0 24 24">
+                      <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                    </svg>
+                  )}
+                </Button>
+              ) : (
+                <span className={styles.chevronSpacer} />
+              )}
+
+              <span className={styles.label}>
+                {partError ? (
+                  <span className={styles.error}>⚠️ Error loading part</span>
+                ) : (
+                  part?.name || 'Loading...'
+                )}
+                {config.endUnitSerialNo && (
+                  <span className={styles.serial}>
+                    (Serial: {config.endUnitSerialNo})
+                  </span>
+                )}
+              </span>
+            </div>
+            {childrenError && (
+              <div className={styles.childError}>
+                <ErrorDisplay
+                  error={childrenError}
+                  onRetry={() => refetchChildren()}
+                  title="Failed to Load Child Configurations"
+                />
+              </div>
+            )}
+          </>
+        )}
+      </TreeItemContent>
+      {!childrenError && (
+        <Collection
+          items={childrenWithParts?.map((item) => ({
+            ...item,
+            id: item.config.uuid,
+          }))}
         >
-          {expandIcon}
-        </span>
-        <span>
-          {partError ? (
-            <span style={{ color: '#dc3545' }}>⚠️ Error loading part</span>
-          ) : (
-            part?.name || 'Loading...'
+          {(item) => (
+            <ConfigNode
+              config={item.config}
+              registerConfig={registerConfig}
+              expandedKeys={expandedKeys}
+            />
           )}
-          {config.endUnitSerialNo && (
-            <span style={{ color: '#666', marginLeft: '8px' }}>
-              (Serial: {config.endUnitSerialNo})
-            </span>
-          )}
-        </span>
-      </div>
-      {/* Show children error even when collapsed */}
-      {childrenError ? (
-        <div style={{ marginLeft: '20px', marginTop: '4px' }}>
-          <ErrorDisplay
-            error={childrenError}
-            onRetry={() => refetchChildren()}
-            title="Failed to Load Child Configurations"
-          />
-        </div>
-      ) : (
-        isExpanded && (
-          <div style={{ marginLeft: '20px' }}>
-            {childrenWithParts?.map(({ config: childConfig }) => (
-              <TreeNode
-                key={childConfig.uuid}
-                config={childConfig}
-                onToggleExpanded={onToggleExpanded}
-                expandedNodes={expandedNodes}
-                onSelectConfig={onSelectConfig}
-                selectedConfigId={selectedNodeId}
-              />
-            ))}
-          </div>
-        )
+        </Collection>
       )}
-    </div>
+    </TreeItem>
   )
 }

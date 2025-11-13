@@ -1,7 +1,78 @@
-.ConfigContainer {
-  display: flex;
-}
-
 .ViewerColumns {
   display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+
+.TreeColumn {
+  flex-shrink: 0;
+  width: 450px;
+}
+
+.PartViewerColumn {
+  flex: 1;
+  min-width: 400px;
+}
+
+/* Machine Selector Box */
+.MachineBox {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: white;
+  overflow: hidden;
+}
+
+.MachineSelector {
+  padding: 12px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.MachineSelector label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+}
+
+.MachineSelector select {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+}
+
+.MachineSelector select:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+/* React Aria Tree styling */
+.react-aria-Tree {
+  padding: 8px;
+  outline: none;
+  max-height: 600px;
+  overflow-y: auto;
+  background: white;
+}
+
+.MachineBox .react-aria-Tree {
+  border: none;
+  border-radius: 0;
+}
+
+.react-aria-Tree:focus-visible {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+/* TreeItem indentation using CSS custom property */
+.react-aria-TreeItem {
+  outline: none;
+  padding-left: calc((var(--tree-item-level) - 1) * 20px);
 }
