@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Tree, type Selection } from 'react-aria-components'
 
 import './App.css'
-import { ConfigNode } from './components/TreeNode'
+import { ConfigurationNode } from './components/ConfigurationNode'
 import { PartViewer } from './components/PartViewer'
 import type { Configuration } from './types/api'
 import { useChildren } from './hooks/useChildren'
@@ -152,7 +152,7 @@ function App() {
                 expandedKeys={expandedNodes}
                 onExpandedChange={handleExpandedChange}
               >
-                <ConfigNode
+                <ConfigurationNode
                   config={selectedMachine}
                   registerConfig={registerConfig}
                   expandedKeys={expandedNodes}

@@ -5,25 +5,25 @@ import {
   Button,
 } from 'react-aria-components'
 import { useEffect } from 'react'
-import { useChildrenWithParts } from '../hooks/useChildrenWithParts'
+import { useChildren } from '../hooks/useChildren'
 import { usePart } from '../hooks/usePart'
 import type { Configuration } from '../types/api'
 import { ErrorDisplay } from './ErrorDisplay'
-import styles from './TreeNode.module.css'
+import styles from './ConfigurationNode.module.css'
 
-interface ConfigNodeProps {
+interface ConfigurationNodeProps {
   config: Configuration
   registerConfig?: (config: Configuration) => void
   expandedKeys?: Set<string>
   isTimeMachine?: boolean
 }
 
-export function ConfigNode({
+export function ConfigurationNode({
   config,
   registerConfig,
   expandedKeys,
   isTimeMachine = false,
-}: ConfigNodeProps) {
+}: ConfigurationNodeProps) {
   // Register this config for lookup when it mounts
   useEffect(() => {
     registerConfig?.(config)
@@ -33,11 +33,11 @@ export function ConfigNode({
 
   // Fetch children to know if node is expandable
   const {
-    data: childrenWithParts,
+    data: children,
     isLoading: childrenLoading,
     error: childrenError,
     refetch: refetchChildren,
-  } = useChildrenWithParts(config.uuid)
+  } = useChildren(config.uuid)
 
   return (
     <TreeItem id={config.uuid} textValue={part?.name || 'Loading...'}>
@@ -89,14 +89,14 @@ export function ConfigNode({
       </TreeItemContent>
       {!childrenError && (
         <Collection
-          items={childrenWithParts?.map((item) => ({
-            ...item,
-            id: item.config.uuid,
+          items={children?.map((child) => ({
+            ...child,
+            id: child.uuid,
           }))}
         >
-          {(item) => (
-            <ConfigNode
-              config={item.config}
+          {(child) => (
+            <ConfigurationNode
+              config={child}
               registerConfig={registerConfig}
               expandedKeys={expandedKeys}
               isTimeMachine={false}
