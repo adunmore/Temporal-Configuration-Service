@@ -1,4 +1,10 @@
 # Temporal Configuration Service
+Temporal Interface for the Chronos Industries Temporal Configuration Service
+
+- ⏳ Navigate the hierarchical structure of Time Machines and their child configurations
+- ⚡️ View parts and update their statuses
+- ⌨️ Keyboard navigation
+- 👆 Responsive design with mobile support
 
 ## Running Locally
 ### Requirements
